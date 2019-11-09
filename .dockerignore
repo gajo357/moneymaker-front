@@ -1,0 +1,13 @@
+.git
+.dockerignore
+.gitignore
+.vscode
+.yarnrc
+.ionide
+node_modules
+build
+npm-debug.log
+Dockerfile*
+docker-compose*
+README.md
+LICENSE
