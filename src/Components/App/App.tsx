@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import ApiService from "../../apiService";
-import { Layout, Spin } from "antd";
+import { Layout, Spin, Icon, InputNumber } from "antd";
 import GamesList from "../GamesList";
 import GameView from "../GameView";
 import { Game } from "../../models/Game";
@@ -16,13 +16,14 @@ const App: React.FC<Props> = ({ apiService }) => {
   const [amount, setAmount] = useState<number>(500);
   const [game, setGame] = useState<Game | undefined>(undefined);
   const [games, setGames] = useState<Game[]>([]);
+  const [hiddenGames, setHiddenGames] = useState<Game[]>([]);
 
   const reloadGames = () => {
-    console.log(games);
     setLoading(true);
     apiService
       .getGames()
       .then(setGames)
+      .then(() => setHiddenGames([]))
       .then(() => setLoading(false))
       .catch(e => {
         showError(e);
@@ -35,30 +36,53 @@ const App: React.FC<Props> = ({ apiService }) => {
 
   return (
     <div className="App">
-      <Spin spinning={loading} tip="Loading" size="large">
-        <Layout>
-          <Layout.Content style={{ marginLeft: 5 }}>
+      <Layout>
+        <Layout.Content style={{ marginLeft: 5 }}>
+          <Spin spinning={loading} tip="Loading" size="large">
             {game ? (
               <GameView
                 amount={amount}
                 game={game}
                 placeBet={(v: number) => {
                   setAmount(amount - v);
+                  setHiddenGames(hiddenGames.concat([game]));
                   setGame(undefined);
                 }}
+                back={() => setGame(undefined)}
               />
             ) : (
               <GamesList
-                setAmount={setAmount}
-                games={games}
+                games={games.filter(
+                  g => !hiddenGames.some(hg => hg.gameLink === g.gameLink)
+                )}
                 setGame={setGame}
-                reload={reloadGames}
                 amount={amount}
               />
             )}
-          </Layout.Content>
-        </Layout>
-      </Spin>
+          </Spin>
+        </Layout.Content>
+        {game ? (
+          <></>
+        ) : (
+          <Layout.Footer style={{ textAlign: "right" }}>
+            {!loading && (
+              <Icon
+                type="reload"
+                onClick={reloadGames}
+                style={{ marginRight: 50 }}
+              />
+            )}
+            Amount:
+            <InputNumber
+              style={{ marginLeft: 10, marginBottom: 5 }}
+              step={1}
+              min={0}
+              defaultValue={amount}
+              onChange={v => v && setAmount(v)}
+            />
+          </Layout.Footer>
+        )}
+      </Layout>
     </div>
   );
 };
