@@ -1,10 +1,10 @@
-export type League = { country: string; league: string };
+export class GameOdds {
+  home = 0;
+  draw = 0;
+  away = 0;
+}
 
-export type Sport = { sport: string; leagues: League[] };
-
-export type GameOdds = { home: number; draw: number; away: number };
-
-export type Game = {
+export type GameInfo = {
   homeTeam: string;
   awayTeam: string;
   date: Date;
@@ -12,7 +12,12 @@ export type Game = {
   sport: string;
   country: string;
   league: string;
-  meanOdds: GameOdds;
-  odds: GameOdds;
-  noMean: number;
+};
+
+export type Game = {
+  info: GameInfo;
+
+  myOdds: GameOdds;
+  bookieOdds: GameOdds;
+  kellies: GameOdds;
 };

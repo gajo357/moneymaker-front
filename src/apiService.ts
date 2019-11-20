@@ -51,7 +51,20 @@ export default class ApiService {
     }).then(r => this.unwrapResponse<TResult>(r));
 
   getGames = () =>
-    this.getCommand<any[]>(`widget?myBookie=${myBookie}`).then(games =>
-      games.map(g => ({ ...g, date: Date.parse(g.date) } as Game))
+    this.getCommand<any[]>(`api/widget?myBookie=${myBookie}`).then(games =>
+      games.map(
+        g =>
+          ({ ...g, info: { ...g.info, date: Date.parse(g.info.date) } } as Game)
+      )
     );
+
+  livelinessProbe = () => this.getCommand<string[]>("api/liveliness");
+
+  saveAmount = (amount: number) =>
+    localStorage.setItem("amount", amount.toString());
+  getAmount = () => {
+    const amount = localStorage.getItem("amount");
+    if (amount) return parseFloat(amount);
+    return 200;
+  };
 }
