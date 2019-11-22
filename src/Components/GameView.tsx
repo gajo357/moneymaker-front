@@ -20,7 +20,7 @@ const GameView: React.FC<Props> = ({
     caption: string,
     meanOdd: number,
     bookieOdd: number,
-    amountToPlace: number
+    amount: number
   ) => {
     return (
       <>
@@ -36,10 +36,10 @@ const GameView: React.FC<Props> = ({
         <Row gutter={[16, 16]}>
           <Col>
             <Button
-              type={amountToPlace > 0 ? "primary" : "dashed"}
-              onClick={() => placeBet(amountToPlace)}
+              type={amount > 0 ? "primary" : "dashed"}
+              onClick={() => placeBet(amount)}
             >
-              Bet {formatNumber(amountToPlace)}
+              {amount > 0 ? `Bet ${formatNumber(amount)}` : "No bet"}
             </Button>
           </Col>
         </Row>

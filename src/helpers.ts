@@ -16,7 +16,7 @@ let formatDate = (d: Date) =>
   }).format(d);
 
 const amountToBet = (kelly: number, amount: number) => {
-  if (kelly <= 0) return 0;
+  if (!kelly || kelly <= 0) return 0;
   return Math.round(amount * kelly);
 };
 
