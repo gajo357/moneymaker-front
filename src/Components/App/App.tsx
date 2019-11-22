@@ -9,7 +9,9 @@ import {
   Tooltip,
   List,
   Row,
-  Col
+  Col,
+  Icon,
+  Switch
 } from "antd";
 import { Game } from "../../models/Game";
 import { showError } from "../../models/Errors";
@@ -20,6 +22,10 @@ interface Props {
 }
 
 const App: React.FC<Props> = ({ apiService }) => {
+  const [showOptions, setShowOptions] = useState(false);
+  const [onlyPositive, setOnlyPositive] = useState(false);
+  const [topTen, setTopTen] = useState(true);
+
   const [loading, setLoading] = useState(false);
   const [loadingProbe, setLoadingProbe] = useState(false);
   const [amount, setAmount] = useState<number>(500);
@@ -62,20 +68,61 @@ const App: React.FC<Props> = ({ apiService }) => {
     setAmount(apiService.getAmount());
   }, []);
 
+  const toggleOptions = () => setShowOptions(!showOptions);
+
+  const filteredGames = games
+    .filter(g => !hiddenGames.some(hg => hg === g.info.gameLink))
+    .filter(
+      g =>
+        !onlyPositive ||
+        g.kellies.home > 0 ||
+        g.kellies.draw > 0 ||
+        g.kellies.away > 0
+    )
+    .slice(0, topTen ? 10 : undefined);
+
   return (
     <div className="App">
       <Layout>
-        <Layout.Content>
-          <Spin
-            spinning={loading}
-            tip="Loading"
-            size="large"
-            style={{ marginLeft: 5 }}
+        <Layout.Header style={{ textAlign: "left" }}>
+          <Button
+            type="primary"
+            onClick={toggleOptions}
+            style={{ marginBottom: 16 }}
           >
-            <List itemLayout="vertical" size="large">
-              {games
-                .filter(g => !hiddenGames.some(hg => hg === g.info.gameLink))
-                .map(game => (
+            <Icon type={showOptions ? "menu-fold" : "menu-unfold"} />
+          </Button>
+          <span style={{ marginLeft: 30, color: "white" }}>
+            Show me the money
+          </span>
+        </Layout.Header>
+        <Layout>
+          {showOptions && (
+            <Layout.Sider style={{ textAlign: "left", paddingTop: 20 }}>
+              <Switch
+                defaultChecked={onlyPositive}
+                onChange={setOnlyPositive}
+              />
+              <span style={{ color: "white", marginTop: 15, marginLeft: 10 }}>
+                Only positive
+              </span>
+              <br />
+              <Switch defaultChecked={topTen} onChange={setTopTen} />
+              <span style={{ color: "white", marginTop: 15, marginLeft: 10 }}>
+                Top ten
+              </span>
+            </Layout.Sider>
+          )}
+
+          <Layout.Content>
+            <Spin
+              spinning={loading}
+              tip="Loading"
+              size="large"
+              style={{ marginLeft: 5 }}
+            >
+              <List itemLayout="vertical" size="large">
+                {filteredGames.map(game => (
                   <GameView
                     key={game.info.gameLink}
                     game={game}
@@ -86,9 +133,10 @@ const App: React.FC<Props> = ({ apiService }) => {
                     }}
                   />
                 ))}
-            </List>
-          </Spin>
-        </Layout.Content>
+              </List>
+            </Spin>
+          </Layout.Content>
+        </Layout>
         <Layout.Footer style={{ position: "sticky", bottom: "0" }}>
           <Row type="flex" justify="center" gutter={[16, 16]}>
             <Col span={8}>
