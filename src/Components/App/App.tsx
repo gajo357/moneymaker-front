@@ -106,6 +106,7 @@ const App: React.FC<Props> = ({ apiService }) => {
             </Col>
             <Col span={8}>
               <InputNumber
+                type="number"
                 step={1}
                 min={0}
                 value={amount}
